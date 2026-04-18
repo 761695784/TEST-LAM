@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Destinataire;
 use App\Models\Campagne;
+use Illuminate\Http\Request;
 use App\Http\Requests\StoreDestinataireRequest;
 use App\Http\Requests\UpdateDestinataireRequest;
 
@@ -71,6 +72,63 @@ class DestinataireController extends Controller
         return redirect()
             ->route('campagnes.show', $campagne)
             ->with('succes', 'Destinataire supprimé.');
+    }
+
+        // ─── Import CSV (BONUS) ───────────────────────────────────────────────────
+
+    public function importCsv(Request $request, Campagne $campagne)
+    {
+        $request->validate([
+            'fichier_csv' => ['required', 'file', 'mimes:csv,txt', 'max:2048'],
+        ], [
+            'fichier_csv.required' => 'Veuillez sélectionner un fichier CSV.',
+            'fichier_csv.mimes'    => 'Le fichier doit être au format CSV.',
+            'fichier_csv.max'      => 'Le fichier ne doit pas dépasser 2 Mo.',
+        ]);
+
+        $fichier   = $request->file('fichier_csv');
+        $contenu   = file($fichier->getRealPath(), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $ajoutes   = 0;
+        $ignores   = 0;
+        $ligneData = [];
+
+        foreach ($contenu as $index => $ligne) {
+            // Ignore la première ligne si c'est un header
+            if ($index === 0 && !preg_match('/^\+?[0-9\s\-]+$/', trim($ligne))) {
+                continue;
+            }
+
+            // Supporte CSV avec virgule ou point-virgule
+            $colonnes = str_getcsv($ligne, ',');
+            if (count($colonnes) < 1) {
+                $colonnes = str_getcsv($ligne, ';');
+            }
+
+            $numero = trim($colonnes[0]);
+
+            if (!preg_match('/^\+?[0-9\s\-]{7,20}$/', $numero)) {
+                $ignores++;
+                continue;
+            }
+
+            $ligneData[] = [
+                'campagne_id'      => $campagne->id,
+                'numero_telephone' => $numero,
+                'statut_appel'     => Destinataire::STATUT_PENDING,
+                'created_at'       => now(),
+                'updated_at'       => now(),
+            ];
+            $ajoutes++;
+        }
+
+        // Insertion en masse pour les performances
+        if (!empty($ligneData)) {
+            Destinataire::insert($ligneData);
+        }
+
+        return redirect()
+            ->route('campagnes.show', $campagne)
+            ->with('succes', "{$ajoutes} destinataire(s) importé(s). {$ignores} ligne(s) ignorée(s).");
     }
 
 }

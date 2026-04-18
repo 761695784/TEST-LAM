@@ -29,6 +29,9 @@ Route::prefix('campagnes')->name('campagnes.')->group(function () {
         Route::put('/{destinataire}',       [DestinataireController::class, 'update'])->name('update');
         Route::delete('/{destinataire}',    [DestinataireController::class, 'destroy'])->name('destroy');
 
+        // Import CSV
+        Route::post('/import-csv',          [DestinataireController::class, 'importCsv'])->name('import');
+
     });
 
 });
