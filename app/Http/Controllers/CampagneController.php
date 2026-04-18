@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCampagneRequest;
+use App\Http\Requests\UpdateCampagneRequest;
 use App\Models\Campagne;
 use App\Models\Destinataire;
 use Illuminate\Http\Request;
@@ -65,27 +66,52 @@ class CampagneController extends Controller
             'filtre_statut' => $request->input('statut_appel'),
         ]);
     }
-    /**
-     * Show the form for editing the specified resource.
-     */
+    //  Formulaire modification
+
     public function edit(Campagne $campagne)
     {
-        //
+        if (!$campagne->estModifiable()) {
+            return redirect()
+                ->route('campagnes.show', $campagne)
+                ->with('erreur', 'Une campagne terminée ou annulée ne peut plus être modifiée.');
+        }
+
+        return view('campagnes.edit', [
+            'campagne' => $campagne,
+            'statuts'  => Campagne::STATUTS,
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Campagne $campagne)
+    //  Mise à jour d'une campagne
+    public function update(UpdateCampagneRequest $request, Campagne $campagne)
     {
-        //
+        if (!$campagne->estModifiable()) {
+            return redirect()
+                ->route('campagnes.show', $campagne)
+                ->with('erreur', 'Cette campagne ne peut plus être modifiée.');
+        }
+
+        $campagne->update($request->validated());
+
+        return redirect()
+            ->route('campagnes.show', $campagne)
+            ->with('succes', 'Campagne mise à jour avec succès.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Campagne $campagne)
+    //  Suppression (DRAFT uniquement)
+       public function destroy(Campagne $campagne)
     {
-        //
+        if (!$campagne->estSupprimable()) {
+            return redirect()
+                ->route('campagnes.index')
+                ->with('erreur', 'Seules les campagnes en brouillon peuvent être supprimées.');
+        }
+
+        $campagne->delete();
+
+        return redirect()
+            ->route('campagnes.index')
+            ->with('succes', 'Campagne supprimée.');
     }
+
 }

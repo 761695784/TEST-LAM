@@ -13,4 +13,8 @@ Route::prefix('campagnes')->name('campagnes.')->group(function () {
     Route::get('/creer',         [CampagneController::class, 'create'])       ->name('create');
     Route::post('/',             [CampagneController::class, 'store'])        ->name('store');
     Route::get('/{campagne}',    [CampagneController::class, 'show'])         ->name('show');
+    Route::get('/{campagne}/modifier', [CampagneController::class, 'edit'])   ->name('edit');
+    Route::put('/{campagne}',    [CampagneController::class, 'update'])       ->name('update');
+    Route::delete('/{campagne}', [CampagneController::class, 'destroy'])      ->name('destroy');
+
 });
