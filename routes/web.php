@@ -17,4 +17,8 @@ Route::prefix('campagnes')->name('campagnes.')->group(function () {
     Route::put('/{campagne}',    [CampagneController::class, 'update'])       ->name('update');
     Route::delete('/{campagne}', [CampagneController::class, 'destroy'])      ->name('destroy');
 
+     // Changement de statut (AJAX ou form POST)
+    Route::patch('/{campagne}/statut', [CampagneController::class, 'changerStatut'])->name('statut');
+
+
 });

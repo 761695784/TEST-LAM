@@ -114,4 +114,55 @@ class CampagneController extends Controller
             ->with('succes', 'Campagne supprimée.');
     }
 
+        //  Changement de statut (standard + AJAX)
+
+    public function changerStatut(Request $request, Campagne $campagne)
+    {
+        $request->validate([
+            'statut' => ['required', 'in:' . implode(',', Campagne::STATUTS)],
+        ]);
+
+        $nouveauStatut = $request->input('statut');
+
+        // Vérification règles métier
+        if (!$campagne->estModifiable()) {
+            $message = 'Cette campagne ne peut plus changer de statut.';
+
+            if ($request->expectsJson()) {
+                return response()->json(['erreur' => $message], 422);
+            }
+
+            return redirect()
+                ->back()
+                ->with('erreur', $message);
+        }
+
+        // Date de planification obligatoire si on passe à SCHEDULED
+        if ($nouveauStatut === Campagne::STATUT_SCHEDULED && !$campagne->date_planification) {
+            $message = 'Veuillez définir une date de planification avant de planifier la campagne.';
+
+            if ($request->expectsJson()) {
+                return response()->json(['erreur' => $message], 422);
+            }
+
+            return redirect()
+                ->back()
+                ->with('erreur', $message);
+        }
+
+        $campagne->update(['statut' => $nouveauStatut]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'succes'  => true,
+                'statut'  => $campagne->statut,
+                'label'   => $campagne->labelStatut(),
+                'badge'   => $campagne->badgeStatut(),
+            ]);
+        }
+
+        return redirect()
+            ->back()
+            ->with('succes', 'Statut mis à jour : ' . $campagne->labelStatut());
+    }
 }
