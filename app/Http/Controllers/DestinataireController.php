@@ -74,7 +74,7 @@ class DestinataireController extends Controller
             ->with('succes', 'Destinataire supprimé.');
     }
 
-        // ─── Import CSV (BONUS) ───────────────────────────────────────────────────
+        //  Import CSV
 
     public function importCsv(Request $request, Campagne $campagne)
     {

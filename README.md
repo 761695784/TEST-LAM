@@ -1,66 +1,156 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# LAM Voice — Gestion de Campagnes Voice
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Application web de gestion de campagnes d'appels voice développée avec Laravel + MySQL.
 
-## About Laravel
+## Prérequis
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP >= 8.3.29
+- Composer
+- MySQL >= 8.0.45
+- Node.js >= 25.6.0
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Installation
 
-## Learning Laravel
+### 1. Cloner le projet
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+git clone https://github.com/761695784/TEST-LAM.git
+cd TEST-LAM
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 2. Installer les dépendances PHP
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+composer install
+```
 
-## Laravel Sponsors
+### 3. Configurer l'environnement
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-### Premium Partners
+Modifier le fichier `.env` avec vos informations de base de données :
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=lam_voice
+DB_USERNAME=root
+DB_PASSWORD=votre_mot_de_passe
+```
 
-## Contributing
+### 4. Lancer la migration
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan migrate
+```
 
-## Code of Conduct
+### 5.  Créer la base de données 
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```Apres avoir lancée la migration, on vous demandera si vous voulez qu'une bdd soit créée, vous entrez yes et la bdd est créée, et les migrations se poursuivent automatiquement 
+```
+### 6. Insérer les données de test 
 
-## Security Vulnerabilities
+```bash
+php artisan db:seed
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 7. Lancer le serveur de développement
 
-## License
+```bash
+php artisan serve
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+L'application est accessible sur : **http://localhost:8000**
+
+---
+
+## Fonctionnalités
+
+### Gestion des campagnes
+- Lister, créer, modifier, consulter et supprimer des campagnes
+- Filtrer par statut (DRAFT, SCHEDULED, RUNNING, COMPLETED, CANCELLED)
+- Rechercher par nom ou pays
+- Changer le statut d'une campagne
+
+### Gestion des destinataires
+- Ajouter un ou plusieurs destinataires
+- Modifier et supprimer des destinataires
+- Filtrer par statut d'appel
+- **Importer depuis un CSV** (format : une colonne `numero_telephone`)
+
+### Statistiques par campagne
+- Nombre total de destinataires
+- Appels en attente, réussis, échoués, sans réponse
+- Durée totale des appels aboutis
+
+---
+
+## Structure des tables
+
+### `campagnes`
+| Colonne | Type | Description |
+|---|---|---|
+| id | bigint | Clé primaire |
+| nom | varchar | Nom de la campagne |
+| pays | varchar | Pays cible |
+| sender | varchar | Expéditeur affiché |
+| message | text | Message vocal |
+| statut | enum | DRAFT / SCHEDULED / RUNNING / COMPLETED / CANCELLED |
+| date_planification | datetime | Obligatoire si SCHEDULED |
+| created_at / updated_at | timestamp | Dates automatiques |
+
+### `destinataires`
+| Colonne | Type | Description |
+|---|---|---|
+| id | bigint | Clé primaire |
+| campagne_id | bigint | FK vers campagnes |
+| numero_telephone | varchar | Numéro au format international |
+| statut_appel | enum | PENDING / SENT / ANSWERED / FAILED / NO_ANSWER |
+| duree_appel | int | Durée en secondes (si ANSWERED) |
+| motif_echec | varchar | Obligatoire si FAILED |
+| created_at / updated_at | timestamp | Dates automatiques |
+
+---
+
+## Format CSV pour l'import
+
+Le fichier CSV doit contenir les numéros de téléphone, un par ligne :
+
+```
+numero_telephone
++221 77 123 45 67
++221 78 234 56 78
++225 07 123 456 78
+```
+
+La première ligne (header) est automatiquement ignorée.
+
+---
+
+## Règles métier
+
+- Une campagne **COMPLETED** ou **CANCELLED** ne peut plus être modifiée
+- Une campagne ne peut être supprimée que si elle est en **DRAFT**
+- La date de planification est **obligatoire** si le statut est **SCHEDULED**
+- Le motif d'échec est **obligatoire** si le statut d'appel est **FAILED**
+
+---
+
+## Technologies utilisées
+
+- **Backend** : Laravel 12,PHP 8.3.29
+- **Base de données** : MySQL V8.0.45
+- **Frontend** : Blade, Bootstrap 5, JavaScript (AJAX)
+- **Validation** : Laravel Form Requests
+
+---
+
+## Auteur
+Malang MARNA
+Développé dans le cadre du test technique LAM (L'AfricaMobile).
