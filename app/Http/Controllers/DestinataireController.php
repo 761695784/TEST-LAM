@@ -3,63 +3,74 @@
 namespace App\Http\Controllers;
 
 use App\Models\Destinataire;
-use Illuminate\Http\Request;
+use App\Models\Campagne;
+use App\Http\Requests\StoreDestinataireRequest;
+use App\Http\Requests\UpdateDestinataireRequest;
 
 class DestinataireController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    //  Ajout d'un ou plusieurs destinataires
+
+    public function store(StoreDestinataireRequest $request, Campagne $campagne)
     {
-        //
+        $numeros = array_unique(array_filter($request->input('numeros', [])));
+
+        foreach ($numeros as $numero) {
+            $campagne->destinataires()->create([
+                'numero_telephone' => trim($numero),
+                'statut_appel'     => Destinataire::STATUT_PENDING,
+            ]);
+        }
+
+        $nb = count($numeros);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'succes'  => true,
+                'message' => "{$nb} destinataire(s) ajouté(s).",
+            ]);
+        }
+
+        return redirect()
+            ->route('campagnes.show', $campagne)
+            ->with('succes', "{$nb} destinataire(s) ajouté(s) avec succès.");
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    //  Formulaire modification destinataire
+
+    public function edit(Campagne $campagne, Destinataire $destinataire)
     {
-        //
+        return view('destinataires.edit', [
+            'campagne'     => $campagne,
+            'destinataire' => $destinataire,
+            'statuts'      => Destinataire::STATUTS,
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    //  Mise à jour destinataire
+
+    public function update(UpdateDestinataireRequest $request, Campagne $campagne, Destinataire $destinataire)
     {
-        //
+        $destinataire->update($request->validated());
+
+        return redirect()
+            ->route('campagnes.show', $campagne)
+            ->with('succes', 'Destinataire mis à jour.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Destinataire $destinataire)
+    //  Suppression destinataire
+
+    public function destroy(Campagne $campagne, Destinataire $destinataire)
     {
-        //
+        $destinataire->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json(['succes' => true]);
+        }
+
+        return redirect()
+            ->route('campagnes.show', $campagne)
+            ->with('succes', 'Destinataire supprimé.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Destinataire $destinataire)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Destinataire $destinataire)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Destinataire $destinataire)
-    {
-        //
-    }
 }
