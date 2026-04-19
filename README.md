@@ -151,6 +151,29 @@ La première ligne (header) est automatiquement ignorée.
 
 ---
 
+##  Captures d’écran
+
+### Liste des campagnes
+![Liste des campagnes](capture/captureLAM1.png)
+
+### Détails d’une campagne
+![Détails d'une campagne](capture/captureLAM2.png)
+
+### Mise à jour d'une campagne
+![Mise à jour d'une campagne](capture/captureLAM3.png)
+
+### Creation d'une campagne
+![Création d'une campagne](capture/captureLAM4.png)
+
+### Modification d'un destinataire
+![modification d'un destinataire](capture/captureLAM5.png)
+
+### Creation d'un destinataire simple
+![Création d'une campagne](capture/captureLAM6.png)
+
+### Ajout de destinataire via import csv
+![modification d'un destinataire](capture/captureLAM7.png)
+
 ## Auteur
 Malang MARNA
 Développé dans le cadre du test technique LAM (L'AfricaMobile).
