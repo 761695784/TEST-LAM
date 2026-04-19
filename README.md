@@ -169,7 +169,7 @@ La première ligne (header) est automatiquement ignorée.
 ![modification d'un destinataire](capture/captureLAM5.png)
 
 ### Creation d'un destinataire simple
-![Création d'une campagne](capture/captureLAM6.png)
+(capture/captureLAM6.png)
 
 ### Ajout de destinataire via import csv
 ![modification d'un destinataire](capture/captureLAM7.png)
